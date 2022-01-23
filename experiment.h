@@ -13,19 +13,13 @@ struct SecMPC_Experiments{
   Metronome tic;
   uint stepCount = 0;
 
-  KOMO *__komo=0;
+  KOMO& komo;
   double timeCost=1e0, ctrlCost=1e0;
 
-  SecMPC_Experiments(rai::Configuration& _C, ObjectiveL& phi, double cycleTime=.1)
-    : C(_C),
-      tic(cycleTime)
-      {
-  }
-
-  SecMPC_Experiments(rai::Configuration& _C, KOMO& komo, double cycleTime=.1, double timeCost=1e1, double ctrlCost=1e-2)
+  SecMPC_Experiments(rai::Configuration& _C, KOMO& _komo, double cycleTime=.1, double timeCost=1e0, double ctrlCost=1e0)
     : C(_C),
       tic(cycleTime),
-      __komo(&komo),
+      komo(_komo),
       timeCost(timeCost), ctrlCost(ctrlCost){
   }
 

@@ -14,11 +14,7 @@ bool SecMPC_Experiments::step(ObjectiveL& phi){
 
   if(!mpc){
     //needs to be done AFTER bot initialization (optitrack..)
-    if(__komo){
-      mpc = make_unique<SecMPC>(C, *__komo, C.getJointState(), timeCost, ctrlCost);
-    }else{
-      mpc = make_unique<SecMPC>(C, phi, C.getJointState(), timeCost, ctrlCost);
-    }
+    mpc = make_unique<SecMPC>(komo, C.getJointState(), timeCost, ctrlCost);
   }
 
   //-- iterate

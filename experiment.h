@@ -15,6 +15,7 @@ struct SecMPC_Experiments{
 
   KOMO& komo;
   double timeCost=1e0, ctrlCost=1e0;
+  int subSeqStart=0, subSeqStop=-1;
 
   SecMPC_Experiments(rai::Configuration& _C, KOMO& _komo, double cycleTime=.1, double timeCost=1e0, double ctrlCost=1e0)
     : C(_C),
@@ -23,7 +24,9 @@ struct SecMPC_Experiments{
       timeCost(timeCost), ctrlCost(ctrlCost){
   }
 
-  bool step(ObjectiveL& phi);
+  bool step();
+
+  void selectSubSeq(int subSeqStart=0, int _subSeqStop=-1);
 };
 
 //===========================================================================

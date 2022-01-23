@@ -9,8 +9,9 @@ void testPnp() {
 
   KOMO komo;
   komo.setModel(C, true);
-  komo.setTiming(3, 1, 3., 1);
+  komo.setTiming(4, 1, 3., 1);
   komo.add_qControlObjective({}, 1, 1e-1);
+  komo.addQuaternionNorms();
 
   // homing
   if(qHome.N) komo.addObjective({}, FS_qItself, {}, OT_sos, {.1}, qHome);
@@ -28,21 +29,48 @@ void testPnp() {
   rai::Enum<rai::ArgWord> placeDirection = rai::_zAxis;
 
   //-- pick
+  //pregrasp
   addBoxPickObjectives(komo, 1., pickDirection, boxName, boxSize, gripperName, palmName, targetName, true);
-  komo.addModeSwitch({2.,3.}, rai::SY_stable, {gripperName, boxName}, true);
+
+  //grasp
+  komo.addModeSwitch({2.,4.}, rai::SY_stable, {gripperName, boxName}, true);
   addBoxPickObjectives(komo, 2., pickDirection, boxName, boxSize, gripperName, palmName, targetName);
 
-  //-- place
-  komo.addModeSwitch({3.,-1.}, rai::SY_stable, {"table", boxName}, false);
-  addBoxPlaceObjectives(komo, 3., placeDirection, boxName, boxSize, targetName, gripperName, palmName);
+  //lift
+  komo.addObjective({3.}, FS_distance, {boxName, "table"}, OT_ineq, {1e1}, {-.1});
 
-#if 1 //only for development
+  //-- place
+  komo.addModeSwitch({4.,-1.}, rai::SY_stable, {"table", boxName}, false);
+  addBoxPlaceObjectives(komo, 4., placeDirection, boxName, boxSize, targetName, gripperName, palmName);
+
+#if 0 //only for development
   komo.optimize();
   cout <<komo.getReport(true);
   komo.view(true, "optimized motion");
   while(komo.view_play(true));
 #endif
 
+
   SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
-  while(ex.step(komo.objectives));
+  ex.selectSubSeq(0, 1);
+
+  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
+
+  while(ex.step());
+
+  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->close(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
+  C.attach(gripperName, boxName);
+  rai::wait();
+
+  ex.selectSubSeq(2,-1);
+
+  while(ex.step());
+
+  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
+  C.attach(targetName, boxName);
+  rai::wait();
+
+  ex.bot->home(ex.C);
+  rai::wait();
+
 }

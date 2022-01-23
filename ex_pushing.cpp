@@ -41,10 +41,10 @@ void testPushing() {
   bool useOptitrack=rai::getParameter<bool>("bot/useOptitrack", false);
 
   SecMPC_Experiments ex(C, komo);
-  ex.step(komo.objectives);
+  ex.step();
   ex.mpc->timingMPC.backtrackingTable=uintA{0, 0, 0, 0, 0};
 
-  while(ex.step(komo.objectives)){
+  while(ex.step()){
     if(useOptitrack){
       C["puck"]->setPosition(C["b1"]->getPosition());
     }

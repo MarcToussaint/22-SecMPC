@@ -24,12 +24,12 @@ void testDroneRace(){
 #if 1
   //-- reactive control
   SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
-  ex.step(komo.objectives);
+  ex.step();
   ex.mpc->tauCutoff = .1;
 
   //void CubicSplineCtrlReference::getReference(arr& q_ref, arr& qDot_ref, arr& qDDot_ref, const arr& q_real, const arr& qDot_real, double ctrlTime){
 
-  while(ex.step(komo.objectives)){
+  while(ex.step()){
     if(ex.mpc->timingMPC.phase==5){ //hard code endless loop by phase backtracking
       ex.mpc->timingMPC.update_setPhase(1);
     }

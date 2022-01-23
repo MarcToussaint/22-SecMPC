@@ -29,7 +29,7 @@ void testBallFollowing() {
   bool useSimulatedBall=!rai::getParameter<bool>("bot/useOptitrack", false);
   arr ballVel, ballCen;
 
-  while(ex.step(komo.objectives)){
+  while(ex.step()){
     if(useSimulatedBall){
       randomWalkPosition(C["ball"], ballCen, ballVel, .001);
     }else{

@@ -20,14 +20,14 @@ void testBallReaching() {
   komo.addObjective({2.}, FS_positionDiff, {"l_gripper", "ball"}, OT_eq, {6e1});
 
   SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
-  ex.step(komo.objectives);
+  ex.step();
   ex.mpc->timingMPC.backtrackingTable=uintA{0, 0};
 
   bool useSimulatedBall=!rai::getParameter<bool>("bot/useOptitrack", false);
   arr ballVel = {.0, .0, .0};
   arr ballCen = C["ball"]->getPosition();
 
-  while(ex.step(komo.objectives)){
+  while(ex.step()){
     if(useSimulatedBall){
       if(!(ex.stepCount%20)){
         ballVel(0) = .01 * rnd.gauss();

@@ -7,6 +7,7 @@
 #include "ex_ballReaching.cpp"
 #include "ex_pnp.cpp"
 #include "ex_pushing.cpp"
+#include "ex_pushing2.cpp"
 #include "ex_droneRace.cpp"
 
 //===========================================================================
@@ -14,14 +15,15 @@
 int main(int argc, char *argv[]){
   rai::initCmdLine(argc, argv);
 
-  //  rnd.clockSeed();
+//  rnd.clockSeed();
   rnd.seed(1);
 
-  //testBallFollowing();
-  //testBallReaching();
-  testPnp();
-  //testPushing();
-  //testDroneRace();
+//  testBallFollowing();
+//  testBallReaching();
+//  testPnp();
+//  testPushing();
+  testPushing2();
+//  testDroneRace();
 
   LOG(0) <<" === bye bye ===\n used parameters:\n" <<rai::getParameters()() <<'\n';
 

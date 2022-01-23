@@ -9,7 +9,7 @@ void testDroneRace(){
   komo.setModel(C, false);
   komo.setTiming(7., 1, 5., 1);
   komo.add_qControlObjective({}, 1, 1e-1);
-  komo.addQuaternionNorms();
+  //komo.addQuaternionNorms();
   komo.addObjective({1.}, FS_positionDiff, {"drone", "target0"}, OT_eq, {1e1});
   komo.addObjective({2.}, FS_positionDiff, {"drone", "target1"}, OT_eq, {1e1});
   komo.addObjective({3.}, FS_positionDiff, {"drone", "target2"}, OT_eq, {1e1});

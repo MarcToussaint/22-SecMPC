@@ -4,6 +4,8 @@ void testBallReaching() {
   rai::Configuration C;
   C.addFile(rai::raiPath("../rai-robotModels/scenarios/pandasTable-calibrated.g"));
 
+  C.addFrame("HandStick", "optitrack_base") ->setShape(rai::ST_marker, {.1});
+
   C.addFrame("ball", "table")
       ->setShape(rai::ST_sphere, {.03})
       .setColor({1.,0,0})
@@ -19,7 +21,7 @@ void testBallReaching() {
   komo.addObjective({1., 2.}, FS_positionRel, {"ball", "l_gripper"}, OT_eq, {{2,3},{1e1,0,0,0,1e1,0}});
   komo.addObjective({2.}, FS_positionDiff, {"l_gripper", "ball"}, OT_eq, {6e1});
 
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
+  SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0);
   ex.step();
   ex.mpc->timingMPC.backtrackingTable=uintA{0, 0};
 

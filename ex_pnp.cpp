@@ -24,7 +24,7 @@ void testPnp() {
   const char* targetName="target";
   //const char* arm1Name="l_panda_coll7";
   //const char* arm2Name="l_panda_coll6";
-  arr boxSize={.06,.15,.09};
+  arr boxSize={.07,.08,.06};
   rai::Enum<rai::ArgWord> pickDirection = rai::_xAxis;
   rai::Enum<rai::ArgWord> placeDirection = rai::_zAxis;
 
@@ -37,9 +37,12 @@ void testPnp() {
   addBoxPickObjectives(komo, 2., pickDirection, boxName, boxSize, gripperName, palmName, targetName);
 
   //lift
-  komo.addObjective({3.}, FS_distance, {boxName, "table"}, OT_ineq, {1e1}, {-.1});
+  //komo.addObjective({3.}, FS_distance, {boxName, "table"}, OT_ineq, {1e1}, {-.1});
 
   //-- place
+  //pre
+  addBoxPlaceObjectives(komo, 3., placeDirection, boxName, boxSize, targetName, gripperName, palmName, -.02, true);
+  //place
   komo.addModeSwitch({4.,-1.}, rai::SY_stable, {"table", boxName}, false);
   addBoxPlaceObjectives(komo, 4., placeDirection, boxName, boxSize, targetName, gripperName, palmName);
 
@@ -51,26 +54,39 @@ void testPnp() {
 #endif
 
 
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
+  SecMPC_Experiments ex(C, komo, .1, 1e0, 0.7);
   ex.selectSubSeq(0, 1);
 
   if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
 
-  while(ex.step());
+  arr boxCen, boxVel;
 
-  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->close(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
+  while(ex.step()){
+    if(ex.bot && ex.bot->optitrack){
+      C[boxName]->setPose(C["green3"]->getPose());
+//      C[boxName]->setPosition(C["b2"]->getPosition());
+    }else{
+      //randomWalkPosition(C[boxName], boxCen, boxVel, .001);
+    }
+  }
+
+  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->close(1.5); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
   C.attach(gripperName, boxName);
-  rai::wait();
+//  rai::wait();
 
   ex.selectSubSeq(2,-1);
 
-  while(ex.step());
+  while(ex.step()){
+    if(ex.bot && ex.bot->optitrack){
+      C[targetName]->setPosition(C["b1"]->getPosition());
+    }
+  }
 
   if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
   C.attach(targetName, boxName);
-  rai::wait();
+//  rai::wait();
 
   ex.bot->home(ex.C);
-  rai::wait();
+//  rai::wait();
 
 }

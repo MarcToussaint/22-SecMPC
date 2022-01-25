@@ -14,7 +14,7 @@ bool SecMPC_Experiments::step(){
 
   if(!mpc){
     //needs to be done AFTER bot initialization (optitrack..)
-    mpc = make_unique<SecMPC>(komo, subSeqStart, subSeqStop, timeCost, ctrlCost);
+    mpc = make_unique<SecMPC>(komo, subSeqStart, subSeqStop, timeCost, ctrlCost, setNextWaypointTangent);
   }
 
   //-- iterate

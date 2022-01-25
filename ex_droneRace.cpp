@@ -4,6 +4,10 @@ void testDroneRace(){
   rai::Configuration C;
   C.addFile("droneRace.g");
 
+  //-- add a mesh to allow drawing the spline plan
+  rai::Mesh splineDisp;
+  C.gl()->add(splineDisp);
+
   //-- define constraints
   KOMO komo;
   komo.setModel(C, false);
@@ -18,12 +22,11 @@ void testDroneRace(){
   komo.addObjective({6.}, FS_positionDiff, {"drone", "target1"}, OT_eq, {1e1});
   komo.addObjective({7.}, FS_position, {"drone"}, OT_eq, {1e1}, {0,-.5, 1.});
 
-
   arrA targetCen(4), targetVel(4);
 
 #if 1
   //-- reactive control
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
+  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0, false);
   ex.step();
   ex.mpc->tauCutoff = .1;
 
@@ -37,6 +40,11 @@ void testDroneRace(){
       rai::Frame *target = C[STRING("target"<<g)];
       randomWalkPosition(target, targetCen(g), targetVel(g), .003);
     }
+    //update the spline during stepping
+    rai::CubicSpline tmpS;
+    ex.mpc->timingMPC.getCubicSpline(tmpS, ex.bot->get_q(), ex.bot->get_qDot());
+    splineDisp.V = tmpS.eval(range(0., tmpS.times.last(), 100));
+    splineDisp.makeLineStrip();
   }
 
 #else

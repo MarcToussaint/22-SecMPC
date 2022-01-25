@@ -20,10 +20,10 @@ int main(int argc, char *argv[]){
 
 //  testBallFollowing();
 //  testBallReaching();
-  testPnp();
+//  testPnp();
 //  testPushing();
 //  testPushing2();
-//  testDroneRace();
+  testDroneRace();
 
   LOG(0) <<" === bye bye ===\n used parameters:\n" <<rai::getParameters()() <<'\n';
 

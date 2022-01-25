@@ -54,7 +54,7 @@ void testPnp() {
 #endif
 
 
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 0.7);
+  SecMPC_Experiments ex(C, komo, .1, 1e0, 0.5);
   ex.selectSubSeq(0, 1);
 
   if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }

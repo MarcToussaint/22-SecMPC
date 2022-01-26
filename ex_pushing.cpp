@@ -38,15 +38,25 @@ void testPushing() {
 //    komo.addObjective({s.phase1}, FS_pose, {s.frames(1)}, OT_eq, {1e0}, {}, 1);
 //  }
 
+#if 0 //for development only
+  komo.optimize();
+  cout <<komo.getReport(true);
+  komo.pathConfig.gl()->ensure_gl().resize(700,500);
+  komo.view(true, "solution");
+  while(komo.view_play(true, 2., "z.vid/"));
+  return;
+#endif
+
   bool useOptitrack=rai::getParameter<bool>("bot/useOptitrack", false);
 
-  SecMPC_Experiments ex(C, komo);
+  SecMPC_Experiments ex(C, komo, .1, 1e0, 1., false);
   ex.step();
   ex.mpc->timingMPC.backtrackingTable=uintA{0, 0, 0, 0, 0};
 
   while(ex.step()){
     if(useOptitrack){
-      C["puck"]->setPosition(C["b1"]->getPosition());
+      C["puck"]->setPosition(C["marc_red"]->getPosition());
+      C["target"]->setPosition(C["green3"]->getPosition());
     }
   }
 }

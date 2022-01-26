@@ -54,23 +54,28 @@ void testPnp() {
 #endif
 
 
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 0.5);
-  ex.selectSubSeq(0, 1);
-
-  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
+  SecMPC_Experiments ex(C, komo, .05, 1e0, .6, false);
+  ex.step();
+  ex.mpc->tauCutoff = .1;
+  ex.mpc->precision = .1;
 
   arr boxCen, boxVel;
 
+  for(uint l=0;l<10;l++){
+  ex.selectSubSeq(0, 1);
+
   while(ex.step()){
     if(ex.bot && ex.bot->optitrack){
-      C[boxName]->setPose(C["green3"]->getPose());
+      C[boxName]->setPose(C["marc_green"]->getPose());
+      C[targetName]->setPosition(C["marc_red"]->getPosition());
 //      C[boxName]->setPosition(C["b2"]->getPosition());
     }else{
       //randomWalkPosition(C[boxName], boxCen, boxVel, .001);
     }
+    if(ex.mpc->timingMPC.done()) break;
   }
 
-  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->close(1.5); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
+  if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->close(.5, .2, 1.); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
   C.attach(gripperName, boxName);
 //  rai::wait();
 
@@ -78,8 +83,12 @@ void testPnp() {
 
   while(ex.step()){
     if(ex.bot && ex.bot->optitrack){
-      C[targetName]->setPosition(C["b1"]->getPosition());
+      arr pos1=C["marc_red"]->getPosition();
+      arr pos2=C[targetName]->getPosition();
+      double alpha=.8;
+      C[targetName]->setPosition(alpha*pos2 + (1.-alpha)*pos1);
     }
+    if(ex.mpc->timingMPC.done()) break;
   }
 
   if(ex.bot && ex.bot->gripperL){ ex.bot->gripperL->open(); while(!ex.bot->gripperL->isDone()) rai::wait(.1); }
@@ -88,5 +97,6 @@ void testPnp() {
 
   ex.bot->home(ex.C);
 //  rai::wait();
+  }
 
 }

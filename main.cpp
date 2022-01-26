@@ -20,8 +20,8 @@ int main(int argc, char *argv[]){
 
 //  testBallFollowing();
 //  testBallReaching();
-//  testPnp();
-  testPushing();
+  testPnp();
+//  testPushing();
 //  testPushing2();
 //  testDroneRace();
 

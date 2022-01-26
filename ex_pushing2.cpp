@@ -27,7 +27,7 @@ void testPushing2() {
   rai::Skeleton S = {
     {1., 2.5, rai::SY_quasiStaticOn, {"table", obj} },
     {1., 2., rai::SY_push, {pusher, "sph"} },
-    {2., 2.5, rai::SY_touch, {obj, target} },
+//    {2., 2., rai::SY_touch, {obj, target} },
   };
   StringA collisions = {
 //    pusher, "sph",
@@ -40,7 +40,7 @@ void testPushing2() {
 
   S.setKOMO(komo, rai::_sequence);
 
-//  komo.addObjective({2., 2.5}, FS_position, {obj}, OT_eq, {1e1}, targetPos);
+  komo.addObjective({2., 2.5}, FS_positionDiff, {obj, target}, OT_eq, {1e1});
 
   for(uint i=0;i<collisions.N;i+=2){
     komo.addObjective({}, FS_distance, {collisions(i), collisions(i+1)}, OT_ineq, {1e1});
@@ -48,12 +48,13 @@ void testPushing2() {
 
   komo.add_collision(true);
 
-#if 0 //for development only
+#if 1 //for development only
   komo.optimize();
   cout <<komo.getReport(true);
   komo.pathConfig.gl()->ensure_gl().resize(700,500);
   komo.view(true, "solution");
   while(komo.view_play(true, 2., "z.vid/"));
+  return;
 #endif
 
   bool useOptitrack=rai::getParameter<bool>("bot/useOptitrack", false);
@@ -64,7 +65,7 @@ void testPushing2() {
 
   while(ex.step()){
     if(useOptitrack){
-      C["puck"]->setPosition(C["b1"]->getPosition());
+      C[obj]->setPosition(C["marc_red"]->getPosition());
     }
   }
 }

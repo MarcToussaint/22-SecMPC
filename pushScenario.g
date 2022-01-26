@@ -11,3 +11,6 @@ puck (table){ joint:rigid Q:[.0 .4 .08]
 
 target (table){ Q:[-.6 .3 .08]
             shape:ssCylinder size:[.06 .06 .005] color:[.6 1 .6] }
+
+marc_red(optitrack_base){ shape:marker, size:[.1] }
+green3(optitrack_base){ shape:marker, size:[.1] }

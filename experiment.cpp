@@ -41,7 +41,7 @@ bool SecMPC_Experiments::step(){
   bot->step(C, .0);
   if(bot->keypressed=='q' || bot->keypressed==27) return false;
 
-  if(mpc->timingMPC.done()) return false;
+  //if(mpc->timingMPC.done()) return false;
 
   return true;
 }

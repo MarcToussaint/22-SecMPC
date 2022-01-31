@@ -1,4 +1,5 @@
 #include "experiment.h"
+#include <OptiTrack/optitrack.h>
 
 bool SecMPC_Experiments::step(){
   stepCount++;
@@ -9,12 +10,14 @@ bool SecMPC_Experiments::step(){
     bot->home(C);
     bot->setControllerWriteData(1);
     if(bot->optitrack) bot->optitrack->pull(C);
+    bot->addNote(0, 0.);
     rai::wait(.2);
   }
 
   if(!mpc){
     //needs to be done AFTER bot initialization (optitrack..)
     mpc = make_unique<SecMPC>(komo, subSeqStart, subSeqStop, timeCost, ctrlCost, setNextWaypointTangent);
+    mpc->tauCutoff = 2.*tic.ticInterval;
   }
 
   //-- iterate
@@ -32,10 +35,15 @@ bool SecMPC_Experiments::step(){
   //-- iterate MPC
   mpc->cycle(C, q_ref, qDot_ref, q, qDot, ctrlTime);
   mpc->report(C);
+  if(mpc->phaseSwitch) bot->addNote(7 * mpc->timingMPC.phase);
 
   //-- send spline update
-  auto sp = mpc->getSpline(bot->get_t());
-  if(sp.pts.N) bot->move(sp.pts, sp.vels, sp.times, true);
+  bot->getState(q, qDot, ctrlTime);
+  auto sp = mpc->getSpline(ctrlTime);
+  if(sp.pts.d0){
+    if(sp.times.first()<0.) bot->addNote(2*(stepCount%12));
+    bot->move(sp.pts, sp.vels, sp.times, true);
+  }
 
   //-- update C
   bot->step(C, .0);
@@ -59,6 +67,7 @@ void randomWalkPosition(rai::Frame* f, arr& centerPos, arr& velocity, double rat
   if(!centerPos.N) centerPos = pos;
   if(!velocity.N) velocity = zeros(pos.N);
   rndGauss(velocity, rate, true);
+  velocity *= .99;
   pos += velocity;
   pos = centerPos + .9 * (pos - centerPos);
   f->setPosition(pos);

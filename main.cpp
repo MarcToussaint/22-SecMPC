@@ -18,9 +18,9 @@ int main(int argc, char *argv[]){
 //  rnd.clockSeed();
   rnd.seed(1);
 
-//  testBallFollowing();
+  testBallFollowing();
 //  testBallReaching();
-  testPnp();
+//  testPnp();
 //  testPushing();
 //  testPushing2();
 //  testDroneRace();

@@ -48,3 +48,16 @@ target3 (world) { X:<d( 45 0 0 1) t(0 1 1)> shape:marker size:[.1] color:[.9 .9 
   (target3) { Q:[0 0 -.2] shape:ssBox, size:[.05 .45 .05 .02] }
   (target3) { Q:[0  .2 0] shape:ssBox, size:[.05 .05 .45 .02] }
   (target3) { Q:[0 -.2 0] shape:ssBox, size:[.05 .05 .45 .02] }
+
+
+target0_before (target0) { Q:[-0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+#target0_after (target0) { Q:[ 0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+
+target1_before (target1) { Q:[-0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+#target1_after (target1) { Q:[0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+
+target2_before (target2) { Q:[-0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+#target2_after (target2) { Q:[0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+
+target3_before (target3) { Q:[-0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }
+#target3_after (target3) { Q:[ 0.2 0 0] shape:marker size:[.1] color:[.9 .9 .9 .5] }

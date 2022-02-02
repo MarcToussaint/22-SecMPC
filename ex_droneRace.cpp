@@ -11,43 +11,52 @@ void testDroneRace(){
   //-- define constraints
   KOMO komo;
   komo.setModel(C, false);
-  komo.setTiming(7., 1, 5., 1);
+  komo.setTiming(8., 1, 5., 1);
   komo.add_qControlObjective({}, 1, 1e-1);
-  //komo.addQuaternionNorms();
-  komo.addObjective({1.}, FS_positionDiff, {"drone", "target0"}, OT_eq, {1e1});
-  komo.addObjective({2.}, FS_positionDiff, {"drone", "target1"}, OT_eq, {1e1});
-  komo.addObjective({3.}, FS_positionDiff, {"drone", "target2"}, OT_eq, {1e1});
-  komo.addObjective({4.}, FS_positionDiff, {"drone", "target3"}, OT_eq, {1e1});
-  komo.addObjective({5.}, FS_positionDiff, {"drone", "target0"}, OT_eq, {1e1});
-  komo.addObjective({6.}, FS_positionDiff, {"drone", "target1"}, OT_eq, {1e1});
-  komo.addObjective({7.}, FS_position, {"drone"}, OT_eq, {1e1}, {0,-.5, 1.});
+  komo.addObjective({1.}, FS_positionDiff, {"drone", "target0_before"}, OT_eq, {1e1});
+  komo.addObjective({2.}, FS_positionDiff, {"drone", "target0"}, OT_eq, {1e1});
+  komo.addObjective({3.}, FS_positionDiff, {"drone", "target1"}, OT_eq, {1e1});
+  komo.addObjective({4.}, FS_positionDiff, {"drone", "target2"}, OT_eq, {1e1});
+  komo.addObjective({5.}, FS_positionDiff, {"drone", "target3"}, OT_eq, {1e1});
+  komo.addObjective({6.}, FS_positionDiff, {"drone", "target0"}, OT_eq, {1e1});
+  komo.addObjective({7.}, FS_positionDiff, {"drone", "target1"}, OT_eq, {1e1});
+  komo.addObjective({8.}, FS_position, {"drone"}, OT_eq, {1e1}, {0,-.5, 1.});
 
   arrA targetCen(4), targetVel(4);
 
-#if 1
-  //-- reactive control
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0, false);
-  ex.step();
-  ex.mpc->tauCutoff = .1;
+  auto ex = std::make_unique<SecMPC_Experiments>(C, komo, .1, 1e0, 0.5, false); //LAST ARGUMENT: NO AUTO-TANGENTS!
 
-  //void CubicSplineCtrlReference::getReference(arr& q_ref, arr& qDot_ref, arr& qDDot_ref, const arr& q_real, const arr& qDot_real, double ctrlTime){
+  ex->step();
+  ex->mpc->tauCutoff = .1;
+#if 0 //possibility to hard-code the tangents (requires true above) - but much less dynamic
+  arr& T=ex->mpc->timingMPC.tangents;
+  T.resize(komo.T-1, 3);
+  for(uint k=0;k<komo.T-1;k+=2){
+    T[k+0] = {1., -1., 0.};
+    T[k+1] = {1., 1., 0.};
+  }
+  ex->mpc->setNextWaypointTangent=false;
+#endif
 
-  while(ex.step()){
-    if(ex.mpc->timingMPC.phase==5){ //hard code endless loop by phase backtracking
-      ex.mpc->timingMPC.update_setPhase(1);
+  while(ex->step()){
+    if(ex->mpc->timingMPC.phase==6){ //hard code endless loop by phase backtracking
+      ex->mpc->timingMPC.update_setPhase(2);
     }
+
+    //simulate wiggling the gates
     for(uint g=0;g<2;g++){
       rai::Frame *target = C[STRING("target"<<g)];
       randomWalkPosition(target, targetCen(g), targetVel(g), .003);
     }
-    //update the spline during stepping
+
+    //update the spline display during stepping
     rai::CubicSpline tmpS;
-    ex.mpc->timingMPC.getCubicSpline(tmpS, ex.bot->get_q(), ex.bot->get_qDot());
+    ex->mpc->timingMPC.getCubicSpline(tmpS, ex->bot->get_q(), ex->bot->get_qDot());
     splineDisp.V = tmpS.eval(range(0., tmpS.times.last(), 100));
     splineDisp.makeLineStrip();
   }
 
-#else
+#if 0
   //-- manually just optimize once and dump spline
   //optimize keyframes
   komo.optimize();

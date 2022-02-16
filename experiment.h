@@ -2,7 +2,6 @@
 
 #include <BotOp/bot.h>
 #include <BotOp/SecMPC.h>
-#include <Core/thread.h>
 
 //===========================================================================
 

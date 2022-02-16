@@ -10,7 +10,6 @@ bool SecMPC_Experiments::step(){
     bot->home(C);
     bot->setControllerWriteData(1);
     if(bot->optitrack) bot->optitrack->pull(C);
-    bot->addNote(0, 0.);
     rai::wait(.2);
   }
 
@@ -35,14 +34,17 @@ bool SecMPC_Experiments::step(){
   //-- iterate MPC
   mpc->cycle(C, q_ref, qDot_ref, q, qDot, ctrlTime);
   mpc->report(C);
-  if(mpc->phaseSwitch) bot->addNote(7 * mpc->timingMPC.phase);
+  if(mpc->phaseSwitch) bot->sound(7 * mpc->timingMPC.phase);
 
   //-- send spline update
   bot->getState(q, qDot, ctrlTime);
   auto sp = mpc->getSpline(ctrlTime);
+  //auto sp = mpc->getShortPath(ctrlTime);
+  //sp.vels.clear();
   if(sp.pts.d0){
-    if(sp.times.first()<0.) bot->addNote(2*(stepCount%12));
-    bot->move(sp.pts, sp.vels, sp.times, true);
+    if(sp.times.first()<0.) bot->sound(2*(stepCount%12));
+    if(sp.vels.N) bot->move(sp.pts, sp.vels, sp.times, true);
+    else bot->move(sp.pts, sp.times, true);
   }
 
   //-- update C

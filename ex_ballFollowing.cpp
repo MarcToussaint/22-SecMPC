@@ -11,11 +11,16 @@ void testBallFollowing() {
       .setColor({1.,0,0})
       .setRelativePosition(arr{-.4,.4,.4});
 
+  C.addFrame("obst", "table")
+      ->setShape(rai::ST_sphere, {.08})
+      .setColor({.9})
+      .setRelativePosition(arr{-.4,.4,.4});
+
   KOMO komo;
   komo.setModel(C, false);
   komo.setTiming(1., 1, 5., 1);
-  komo.add_qControlObjective({}, 1, 1e-1);
-  komo.addQuaternionNorms();
+  komo.add_qControlObjective({}, 1, 1e0);
+  komo.add_qControlObjective({1.}, 0, 1e-1);
 
   komo.addObjective({1.}, FS_positionDiff, {"l_gripper", "ball"}, OT_eq, {1e1});
 
@@ -26,7 +31,9 @@ void testBallFollowing() {
   while(komo.view_play(true));
 #endif
 
-  SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0);
+  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
+  ex.step();
+  ex.mpc->tauCutoff = .2;
 
   bool useSimulatedBall=!rai::getParameter<bool>("bot/useOptitrack", false);
   arr ballVel, ballCen;
@@ -37,5 +44,6 @@ void testBallFollowing() {
     }else{
       C["ball"]->setPosition(C["HandStick"]->getPosition());
     }
+    C["obst"]->setRelativePosition({-.4, .4 + .3*sin(ex.stepCount*.03), .4});
   }
 }

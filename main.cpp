@@ -9,6 +9,7 @@
 #include "ex_pushing.cpp"
 #include "ex_pushing2.cpp"
 #include "ex_droneRace.cpp"
+#include "ex_baselines.cpp"
 
 //===========================================================================
 
@@ -24,6 +25,11 @@ int main(int argc, char *argv[]){
 //  testPushing();
 //  testPushing2();
 //  testDroneRace();
+
+  //-- baselines
+//  ex_1DApproach();
+//  phase_TimeOpt(true);
+//  phase_LQR(true, true);
 
   LOG(0) <<" === bye bye ===\n used parameters:\n" <<rai::getParameters()() <<'\n';
 

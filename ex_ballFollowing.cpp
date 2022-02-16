@@ -42,12 +42,12 @@ void testBallFollowing() {
 
   while(ex.step()){
     if(useSimulatedBall){
-      randomWalkPosition(C["ball"], ballCen, ballVel, .001);
+//      randomWalkPosition(C["ball"], ballCen, ballVel, .001);
+      C["obst"]->setRelativePosition({-.4, .4 + .3*sin(ex.stepCount*.03), .4});
     }else{
 //      C["ball"]->setPosition(C["HandStick"]->getPosition());
       C["obst"]->setPosition(C["HandStick"]->getPosition());
     }
-//    C["obst"]->setRelativePosition({-.4, .4 + .3*sin(ex.stepCount*.03), .4});
     if(ex.mpc->timingMPC.phase==1){ //hard code endless loop by phase backtracking
       ex.mpc->timingMPC.update_setPhase(0);
     }

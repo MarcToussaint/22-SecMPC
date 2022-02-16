@@ -40,7 +40,6 @@ bool SecMPC_Experiments::step(){
   bot->getState(q, qDot, ctrlTime);
 //  auto sp = mpc->getSpline(ctrlTime);
   auto sp = mpc->getShortPath(ctrlTime);
-//  sp.vels.clear();
   if(sp.pts.d0){
 //    if(sp.times.first()<0.) bot->sound(2*(stepCount%12));
     if(sp.vels.N) bot->move(sp.pts, sp.vels, sp.times, true);

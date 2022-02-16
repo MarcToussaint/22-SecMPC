@@ -4,7 +4,9 @@ void testBallFollowing() {
   rai::Configuration C;
   C.addFile(rai::raiPath("../rai-robotModels/scenarios/pandasTable-calibrated.g"));
 
-  C.addFrame("HandStick", "optitrack_base") ->setShape(rai::ST_marker, {.1});
+  C.addFrame("HandStick", "optitrack_base")
+      ->setShape(rai::ST_marker, {.1})
+      .setColor({.9});
 
   C.addFrame("ball", "table")
       ->setShape(rai::ST_sphere, {.03})
@@ -31,9 +33,9 @@ void testBallFollowing() {
   while(komo.view_play(true));
 #endif
 
-  SecMPC_Experiments ex(C, komo, .1, 1e0, 1e0);
+  SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0);
   ex.step();
-  ex.mpc->tauCutoff = .2;
+  ex.mpc->tauCutoff = .1;
 
   bool useSimulatedBall=!rai::getParameter<bool>("bot/useOptitrack", false);
   arr ballVel, ballCen;
@@ -42,8 +44,13 @@ void testBallFollowing() {
     if(useSimulatedBall){
       randomWalkPosition(C["ball"], ballCen, ballVel, .001);
     }else{
-      C["ball"]->setPosition(C["HandStick"]->getPosition());
+//      C["ball"]->setPosition(C["HandStick"]->getPosition());
+      C["obst"]->setPosition(C["HandStick"]->getPosition());
     }
-    C["obst"]->setRelativePosition({-.4, .4 + .3*sin(ex.stepCount*.03), .4});
+//    C["obst"]->setRelativePosition({-.4, .4 + .3*sin(ex.stepCount*.03), .4});
+    if(ex.mpc->timingMPC.phase==1){ //hard code endless loop by phase backtracking
+      ex.mpc->timingMPC.update_setPhase(0);
+    }
+
   }
 }

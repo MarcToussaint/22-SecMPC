@@ -42,8 +42,8 @@ bool SecMPC_Experiments::step(){
   auto sp = mpc->getShortPath(ctrlTime);
   if(sp.pts.d0){
 //    if(sp.times.first()<0.) bot->sound(2*(stepCount%12));
-    if(sp.vels.N) bot->move(sp.pts, sp.vels, sp.times, true);
-    else bot->move(sp.pts, sp.times, true);
+    if(sp.vels.N) bot->move(sp.pts, sp.vels, sp.times, true, ctrlTime);
+    else bot->move(sp.pts, sp.times, true, ctrlTime);
   }
 
   //-- update C

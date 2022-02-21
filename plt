@@ -5,7 +5,7 @@ set style data lines
 J = 14
 
 plot \
-'z.panda.dat' us 1:3 t 'real2', '' us 1:(column(J+3)) t 'ref2',\
+'z.panda.dat' us 1:2 t 'real2', '' us 1:(column(J+2)) t 'ref2',\
 'z.ref' us 1:3 t 'real2', '' us 1:(column(J+3)) t 'ref2',\
 'z.ref2' us 1:3 t 'real2', '' us 1:(column(J+3)) t 'ref2'
 exit

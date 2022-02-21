@@ -33,7 +33,7 @@ void testBallFollowing() {
   while(komo.view_play(true));
 #endif
 
-  SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0);
+  SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0, false);
   ex.step();
   ex.mpc->tauCutoff = .1;
 
@@ -48,9 +48,9 @@ void testBallFollowing() {
 //      C["ball"]->setPosition(C["HandStick"]->getPosition());
       C["obst"]->setPosition(C["HandStick"]->getPosition());
     }
-    if(ex.mpc->timingMPC.phase==1){ //hard code endless loop by phase backtracking
-      ex.mpc->timingMPC.update_setPhase(0);
-    }
+//    if(ex.mpc->timingMPC.phase==1){ //hard code endless loop by phase backtracking
+//      ex.mpc->timingMPC.update_setPhase(0);
+//    }
 
   }
 }

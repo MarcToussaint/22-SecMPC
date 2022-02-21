@@ -12,6 +12,8 @@ struct SecMPC_Experiments{
   Metronome tic;
   uint stepCount = 0;
 
+  ofstream fil;
+
   KOMO& komo;
   double timeCost=1e0, ctrlCost=1e0;
   int subSeqStart=0, subSeqStop=-1;
@@ -22,6 +24,7 @@ struct SecMPC_Experiments{
       tic(cycleTime),
       komo(_komo),
       timeCost(timeCost), ctrlCost(ctrlCost), setNextWaypointTangent(_setNextWaypointTangent){
+    fil.open(STRING("z." <<rai::date(true) <<".secMPC.log"));
   }
 
   bool step();
@@ -33,3 +36,6 @@ struct SecMPC_Experiments{
 
 //helper
 void randomWalkPosition(rai::Frame* f, arr& centerPos, arr& velocity, double rate=.001);
+
+
+void playLog(const rai::String& logfile);

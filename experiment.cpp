@@ -1,5 +1,12 @@
 #include "experiment.h"
+
+#    include <GL/glew.h>
+#    include <GL/glut.h>
+
 #include <OptiTrack/optitrack.h>
+#include <Gui/opengl.h>
+#include <Kin/viewer.h>
+
 
 bool SecMPC_Experiments::step(){
   stepCount++;
@@ -35,6 +42,8 @@ bool SecMPC_Experiments::step(){
   mpc->cycle(C, q_ref, qDot_ref, q, qDot, ctrlTime);
   mpc->report(C);
   if(mpc->phaseSwitch) bot->sound(7 * mpc->timingMPC.phase);
+
+  fil <<stepCount <<' ' <<ctrlTime <<' ' <<q.modRaw() <<' ' <<mpc->timingMPC.phase <<endl;
 
   //-- send spline update
   bot->getState(q, qDot, ctrlTime);
@@ -73,3 +82,32 @@ void randomWalkPosition(rai::Frame* f, arr& centerPos, arr& velocity, double rat
   pos = centerPos + .9 * (pos - centerPos);
   f->setPosition(pos);
 }
+
+//===========================================================================
+
+
+void playLog(const rai::String& logfile){
+  rai::Configuration C;
+  C.addFile(rai::raiPath("../rai-robotModels/scenarios/pandasTable-calibrated.g"));
+
+  arr dat;
+  dat <<FILE(logfile);
+  cout <<dat <<endl;
+
+  rai::String text;
+  C.gl()->ensure_gl().add([&text](OpenGL& gl){
+    glColor(.8,.8,.8,.5);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glOrtho(0., (double)gl.width, (double)gl.height, .0, -1., 1.);
+    glDrawText(text, 20, gl.height-20, 0, true);
+  });
+
+  for(uint t=0;t<dat.d0;t++){
+    C.setJointState(dat(t, {2,2+13}));
+    text.clear() <<"phase: " <<dat(t,-1) <<" ctrlTime:" <<dat(t,1);
+    C.watch(true);
+  }
+
+};

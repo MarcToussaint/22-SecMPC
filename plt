@@ -2,10 +2,10 @@ set style data lines
 
 #plot 'z.dat' 0:1 t 'time'
 
-J = 14
+J = 7
 
 plot \
-'z.panda.dat' us 1:3 t 'real2', '' us 1:(column(J+3)) t 'ref2',\
+'z.panda0.dat' us 1:5 t 'real2', '' us 1:(column(J+5)) t 'ref2',\
 'z.ref' us 1:3 t 'real2', '' us 1:(column(J+3)) t 'ref2',\
 'z.ref2' us 1:3 t 'real2', '' us 1:(column(J+3)) t 'ref2'
 exit

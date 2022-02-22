@@ -11,6 +11,11 @@ void testBallReaching() {
       .setColor({1.,0,0})
       .setRelativePosition(arr{-.4,.4,.4});
 
+  C.addFrame("obst", "table")
+      ->setShape(rai::ST_capsule, {.1, .08})
+      .setColor({.9})
+      .setRelativePosition(arr{-.0,.4,.4});
+
   //-- define constraints
   KOMO komo;
   komo.setModel(C, false);
@@ -23,14 +28,16 @@ void testBallReaching() {
 
   SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0);
   ex.step();
+  ex.mpc->tauCutoff = .1;
   ex.mpc->timingMPC.backtrackingTable=uintA{0, 0, 0};
+  //ex.mpc->verbose = 3;
 
   bool useSimulatedBall=!rai::getParameter<bool>("bot/useOptitrack", false);
   arr ballVel, ballCen;
 
   while(ex.step()){
     if(useSimulatedBall){
-      randomWalkPosition(C["ball"], ballCen, ballVel, .0001);
+      randomWalkPosition(C["ball"], ballCen, ballVel, .0005);
     }else{
       C["ball"]->setPosition(C["HandStick"]->getPosition());
     }

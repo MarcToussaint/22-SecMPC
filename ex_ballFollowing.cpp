@@ -14,7 +14,7 @@ void testBallFollowing() {
       .setRelativePosition(arr{-.4,.4,.4});
 
   C.addFrame("obst", "table")
-      ->setShape(rai::ST_sphere, {.08})
+      ->setShape(rai::ST_capsule, {.1, .08})
       .setColor({.9})
       .setRelativePosition(arr{-.4,.4,.4});
 
@@ -47,7 +47,7 @@ void testBallFollowing() {
       C["obst"]->setRelativePosition({-.4, .4 + .3*sin(ex.stepCount*.03), .4});
     }else{
 //      C["ball"]->setPosition(C["HandStick"]->getPosition());
-      C["obst"]->setPosition(C["HandStick"]->getPosition());
+      C["obst"]->setPose(C["HandStick"]->getPose());
     }
 //    if(ex.mpc->timingMPC.phase==1){ //hard code endless loop by phase backtracking
 //      ex.mpc->timingMPC.update_setPhase(0);

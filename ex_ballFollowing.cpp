@@ -36,6 +36,7 @@ void testBallFollowing() {
   SecMPC_Experiments ex(C, komo, .02, 1e0, 1e0, false);
   ex.step();
   ex.mpc->tauCutoff = .1;
+  //ex.mpc->timingMPC.neverDone=true;
 
   bool useSimulatedBall=!rai::getParameter<bool>("bot/useOptitrack", false);
   arr ballVel, ballCen;

@@ -24,7 +24,7 @@ struct SecMPC_Experiments{
       tic(cycleTime),
       komo(_komo),
       timeCost(timeCost), ctrlCost(ctrlCost), setNextWaypointTangent(_setNextWaypointTangent){
-    fil.open(STRING("z." <<rai::date(true) <<".secMPC.log"));
+    //fil.open(STRING("z." <<rai::date(true) <<".secMPC.log"));
   }
 
   bool step();

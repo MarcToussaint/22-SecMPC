@@ -43,7 +43,9 @@ bool SecMPC_Experiments::step(){
   mpc->report(C);
   if(mpc->phaseSwitch) bot->sound(7 * mpc->timingMPC.phase);
 
-  fil <<stepCount <<' ' <<ctrlTime <<' ' <<q.modRaw() <<' ' <<mpc->timingMPC.phase <<endl;
+  if(fil.is_open()){
+    fil <<stepCount <<' ' <<ctrlTime <<' ' <<q.modRaw() <<' ' <<mpc->timingMPC.phase <<endl;
+  }
 
   //-- send spline update
   bot->getState(q, qDot, ctrlTime);

@@ -1,0 +1,16 @@
+set style data lines
+
+set ylabel 'acceleration'
+set xlabel 'position x_0 (v_0=1, x_T=0, v_T=0)'
+
+plot [-5:5] \
+'z.phase.pdc' us 1:5 ls -1 t 'clipped Linear Regulator',\
+'z.phase.mpc' us 1:5 ls 7 t 'TimingOpt'
+
+#'z.phase.pd' us 1:5 ls -1 not,\
+
+pause(1)
+set terminal pdf size 4,2.5
+set output "z.acc.pdf"
+replot
+set terminal wxt

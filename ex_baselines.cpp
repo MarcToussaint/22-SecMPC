@@ -35,7 +35,6 @@ void ex_1DApproach(){
 
 //===========================================================================
 
-
 void phase_TimeOpt(bool zeroVel){
 //  rai::Configuration C;
 //  C.addFile("model1d.g");
@@ -47,8 +46,8 @@ void phase_TimeOpt(bool zeroVel){
 
   ofstream fil("z.phase.mpc");
   for(double v=-5.;v<=5.;v+=.5){
-    if(zeroVel) v=0.;
-    for(double x=-10.;x<=10.;x+=(zeroVel?.1:.5)){
+    if(zeroVel) v=1.;
+    for(double x=-5.;x<=5.;x+=(zeroVel?.05:.5)){
 
       mpc.solve({x}, {v}, 1);
 
@@ -80,10 +79,10 @@ void phase_LQR(double zeroVel, bool clipped){
   double kp=2., kd=2.*::sqrt(kp); //critically damped
   double tau=.1;
   double delta=.01;  //e^-(t*kd/2)*x = d   -> - 2log(d/x)/kd
-  ofstream fil("z.phase.pd");
+  ofstream fil(STRING("z.phase.pd"<<(clipped?"c":"")));
   for(double v=-5.;v<=5.;v+=.5){
     if(zeroVel) v=1.;
-    for(double x=-10.;x<=10.;x+=(zeroVel?.1:.5)){
+    for(double x=-5.;x<=5.;x+=(zeroVel?.05:.5)){
       double x_ = x;
       if(clipped) rai::clip(x_, -2., 2.);
       double a = -kp*x_ -kd*v;
@@ -100,6 +99,46 @@ void phase_LQR(double zeroVel, bool clipped){
   }
   gnuplot("load 'plt.acc'", true);
 }
+
+//===========================================================================
+
+void needleThreading2D(){
+  arr waypoints = {{2,2}, {0,0, 0, 1}};
+
+//  SecMPC mpc(komo, 0, -1, 1e0, 0.5, false);
+  TimingMPC mpc(waypoints , 1., 1.);
+  rai::CubicSpline sp;
+
+  ofstream fil("z.path");
+  for(double pos=0.;pos<=.8;pos+=.05){
+    arr x = {.1, -1.+pos};
+    arr v = {0., 2.};
+    mpc.tau = 10.*ones(waypoints.d0);
+    mpc.solve(x, v, 1);
+
+    mpc.getCubicSpline(sp, {x}, {v});
+
+#if 1 //plotting the solution
+    arr path = sp.eval(range(0., sp.times.last(), 100));
+    fil <<path.modRaw() <<"\n" <<endl;
+    gnuplot("plot [-.5:.5] 'z.path' us 1:2");
+    rai::wait();
+#endif
+
+    double timeToGo = sp.times.last();
+
+//      double tau=.1;
+//      arr q, qDot, qDDot, qTau, qDotTau;
+//      sp.eval(q, qDot, qDDot, 0.);
+//      sp.eval(qTau, qDotTau, NoArr, tau);
+//      fil <<x <<' ' <<v <<' ' <<q.modRaw() <<' ' <<qDot.modRaw() <<' ' <<qDDot.modRaw() <<' ' <<qTau.modRaw() <<' ' <<qDotTau.modRaw() <<' ' <<timeToGo <<endl;
+//    }
+//    if(zeroVel) break;
+  }
+
+//  gnuplot("load 'plt.phase'", true);
+}
+
 
 //===========================================================================
 #if 0

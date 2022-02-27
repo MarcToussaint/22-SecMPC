@@ -1,0 +1,10 @@
+set style data lines
+
+plot [-.11:.11] 'z.path' us 1:2 not
+
+pause(1)
+set terminal pdf size 3,3
+set output "z.needle.pdf"
+replot
+set terminal wxt
+

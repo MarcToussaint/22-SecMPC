@@ -1,0 +1,15 @@
+set style data lines
+
+set ylabel 'velocity v_0'
+set xlabel 'position x_0 (x_T=0, v_T=0)'
+
+plot [-6:6][-6:6] \
+'z.phase.pd' us 1:2:($6-$1):($7-$2) with vectors ls -1 head size 0.1,20,60 filled t 'Linear Regulator',\
+'z.phase.mpc' us 1:2:($6-$1):($7-$2) with vectors ls 7 head size 0.1,20,60 filled t 'TimingOpt',
+
+pause(1)
+set terminal pdf size 4,4
+set output "z.phase.pdf"
+replot
+set terminal wxt
+

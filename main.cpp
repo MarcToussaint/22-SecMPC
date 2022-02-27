@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
   rnd.seed(1);
 
 //  testBallFollowing();
-  testBallReaching();
+//  testBallReaching();
 //  testPnp();
 //  testPushing();
 //  testPushing2();
@@ -35,8 +35,9 @@ int main(int argc, char *argv[]){
 
   //-- baselines
 //  ex_1DApproach();
-//  phase_TimeOpt(true);
-//  phase_LQR(true, true);
+  phase_TimeOpt(true);
+  phase_LQR(true, true);
+//  needleThreading2D();
 
   LOG(0) <<" === bye bye ===\n used parameters:\n" <<rai::getParameters()() <<'\n';
 

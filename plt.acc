@@ -4,8 +4,8 @@ set ylabel 'acceleration'
 set xlabel 'position x_0 (v_0=1, x_T=0, v_T=0)'
 
 plot [-5:5] \
-'z.phase.pdc' us 1:5 ls -1 t 'clipped Linear Regulator',\
-'z.phase.mpc' us 1:5 ls 7 t 'TimingOpt'
+'z.phase.pdc' us 1:5 ls -1 t 'Linear Regulator (clipped)',\
+'z.phase.mpc' us 1:5 ls 9 t 'TimingOpt'
 
 #'z.phase.pd' us 1:5 ls -1 not,\
 

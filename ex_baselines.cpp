@@ -87,7 +87,9 @@ void phase_LQR(double zeroVel, bool clipped){
       if(clipped) rai::clip(x_, -2., 2.);
       double a = -kp*x_ -kd*v;
 
-      double d = fabs(x)/delta;
+//      double d = fabs(x)/delta;
+      double amp = x / sin(atan(x/v));
+      double d = amp/delta;
       double timeToGo = 2.*log((d>1.?d:1.))/kd;
 
       double v1 = v + tau*a;
@@ -97,7 +99,8 @@ void phase_LQR(double zeroVel, bool clipped){
     }
     if(zeroVel) break;
   }
-  gnuplot("load 'plt.acc'", true);
+//  gnuplot("load 'plt.acc'", true);
+  gnuplot("load 'plt.timeToGo'", true);
 }
 
 //===========================================================================

@@ -1,9 +1,12 @@
 set style data lines
 
-plot [-.11:.11] 'z.path' us 1:2 not
+set ylabel 'position y'
+set xlabel 'position x'
+
+plot [-.11:.11] 'z.path' us 1:2 ls 9 not, 'z.starts' us 1:2 w p ls 9 pt 9 not
 
 pause(1)
-set terminal pdf size 3,3
+set terminal pdf size 2.5,3.5
 set output "z.needle.pdf"
 replot
 set terminal wxt

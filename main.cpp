@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
 
   //-- baselines
 //  ex_1DApproach();
-  phase_TimeOpt(true);
+//  phase_TimeOpt(true);
   phase_LQR(true, true);
 //  needleThreading2D();
 

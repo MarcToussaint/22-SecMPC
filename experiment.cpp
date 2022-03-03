@@ -24,6 +24,7 @@ bool SecMPC_Experiments::step(){
     //needs to be done AFTER bot initialization (optitrack..)
     mpc = make_unique<SecMPC>(komo, subSeqStart, subSeqStop, timeCost, ctrlCost, setNextWaypointTangent);
     mpc->tauCutoff = 2.*tic.ticInterval;
+//    mpc->verbose = 3;
   }
 
   //-- iterate
@@ -51,6 +52,7 @@ bool SecMPC_Experiments::step(){
   bot->getState(q, qDot, ctrlTime);
 //  auto sp = mpc->getSpline(ctrlTime);
   auto sp = mpc->getShortPath(ctrlTime);
+//  auto sp = mpc->getShortPath_debug(ctrlTime);
   if(sp.pts.d0){
 //    if(sp.times.first()<0.) bot->sound(2*(stepCount%12));
     if(sp.vels.N) bot->move(sp.pts, sp.vels, sp.times, true, ctrlTime);

@@ -47,10 +47,12 @@ void testPnp() {
   addBoxPlaceObjectives(komo, 4., placeDirection, boxName, boxSize, targetName, gripperName, palmName);
 
 #if 0 //only for development
+  komo.reportProblem();
   komo.optimize();
   cout <<komo.getReport(true);
   komo.view(true, "optimized motion");
   while(komo.view_play(true));
+//  return;
 #endif
 
 

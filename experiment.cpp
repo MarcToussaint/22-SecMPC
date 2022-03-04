@@ -47,7 +47,7 @@ bool SecMPC_Experiments::step(){
   if(fil.is_open()){
     fil <<stepCount <<' ' <<ctrlTime <<' ' <<mpc->timingMPC.phase <<endl;
     q.writeTagged(fil, "q_real", true);
-    mpc->pathMPC.path.writeTagged(fil, "waypoints", true);
+    mpc->waypointMPC.path.writeTagged(fil, "waypoints", true);
     mpc->timingMPC.tau.writeTagged(fil, "tau", true);
     mpc->shortMPC.path.writeTagged(fil, "shortPath", true);
     C.getFrameState(logPoses).writeTagged(fil, "poses", true);

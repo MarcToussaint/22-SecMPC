@@ -45,6 +45,8 @@ void testPnp() {
   //place
   komo.addModeSwitch({4.,-1.}, rai::SY_stable, {"table", boxName}, false);
   addBoxPlaceObjectives(komo, 4., placeDirection, boxName, boxSize, targetName, gripperName, palmName);
+  //running
+  komo.addObjective({3.,4.}, FS_positionDiff, {boxName, targetName}, OT_eq, 1e0*arr({2,3},{1,0,0,0,1,0}));
 
 #if 0 //only for development
   komo.reportProblem();
@@ -56,7 +58,8 @@ void testPnp() {
 #endif
 
 
-  SecMPC_Experiments ex(C, komo, .05, 1e0, .6, false);
+  SecMPC_Experiments ex(C, komo, .03, 1e0, .6);
+  ex.logPoses = C.getFrames({boxName, targetName});
   ex.step();
   ex.mpc->tauCutoff = .1;
   ex.mpc->precision = .1;
@@ -70,6 +73,7 @@ void testPnp() {
     if(ex.bot && ex.bot->optitrack){
       C[boxName]->setPose(C["marc_green"]->getPose());
       C[targetName]->setPosition(C["marc_red"]->getPosition());
+      C["obst_base"]->setPose(C["HandStick"]->getPose());
 //      C[boxName]->setPosition(C["b2"]->getPosition());
     }else{
       //randomWalkPosition(C[boxName], boxCen, boxVel, .001);
@@ -85,10 +89,13 @@ void testPnp() {
 
   while(ex.step()){
     if(ex.bot && ex.bot->optitrack){
-      arr pos1=C["marc_red"]->getPosition();
-      arr pos2=C[targetName]->getPosition();
-      double alpha=.8;
-      C[targetName]->setPosition(alpha*pos2 + (1.-alpha)*pos1);
+      C[boxName]->setPose(C["marc_green"]->getPose());
+      C[targetName]->setPosition(C["marc_red"]->getPosition());
+      C["obst_base"]->setPose(C["HandStick"]->getPose());
+//      arr pos1=C["marc_red"]->getPosition();
+//      arr pos2=C[targetName]->getPosition();
+//      double alpha=.8;
+//      C[targetName]->setPosition(alpha*pos2 + (1.-alpha)*pos1);
     }
     if(ex.mpc->timingMPC.done()) break;
   }

@@ -45,7 +45,11 @@ bool SecMPC_Experiments::step(){
   if(mpc->phaseSwitch) bot->sound(7 * mpc->timingMPC.phase);
 
   if(fil.is_open()){
-    fil <<stepCount <<' ' <<ctrlTime <<' ' <<q.modRaw() <<' ' <<mpc->timingMPC.phase <<endl;
+    fil <<stepCount <<' ' <<ctrlTime <<' ' <<mpc->timingMPC.phase <<endl;
+    q.writeTagged(fil, "q_real", true);
+    mpc->pathMPC.path.writeTagged(fil, "waypoints", true);
+    mpc->timingMPC.tau.writeTagged(fil, "tau", true);
+    mpc->shortMPC.path.writeTagged(fil, "shortPath", true);
   }
 
   //-- send spline update
@@ -89,29 +93,85 @@ void randomWalkPosition(rai::Frame* f, arr& centerPos, arr& velocity, double rat
 
 //===========================================================================
 
+void setCamera(OpenGL& gl, rai::Frame* camF){
+  rai::Camera& cam = gl.camera;
+  {
+    auto _dataLock = gl.dataLock(RAI_HERE);
+    cam.X = camF->ensure_X();
+
+    rai::Node *at=0;
+    if((at=camF->ats->getNode("focalLength"))) cam.setFocalLength(at->get<double>());
+    if((at=camF->ats->getNode("orthoAbsHeight"))) cam.setHeightAbs(at->get<double>());
+    if((at=camF->ats->getNode("zRange"))){ arr z=at->get<arr>(); cam.setZRange(z(0), z(1)); }
+    if((at=camF->ats->getNode("width"))) gl.width=at->get<double>();
+    if((at=camF->ats->getNode("height"))) gl.height=at->get<double>();
+    //    cam.setWHRatio((double)gl.width/gl.height);
+  }
+  gl.resize(gl.width, gl.height);
+}
 
 void playLog(const rai::String& logfile){
   rai::Configuration C;
-  C.addFile(rai::raiPath("../rai-robotModels/scenarios/pandasTable-calibrated.g"));
+  C.addFile("graspScenario.g");
 
-  arr dat;
-  dat <<FILE(logfile);
-  cout <<dat <<endl;
+  uint stepCount, phase;
+  double ctrlTime;
+  arr q_real, waypoints, tau, shortPath;
 
-  rai::String text;
-  C.gl()->ensure_gl().add([&text](OpenGL& gl){
-    glColor(.8,.8,.8,.5);
+  OpenGL gl;
+  gl.add(glStandardScene);
+
+  if(C["camera_gl"]) setCamera(gl, C["camera_gl"]);
+
+  gl.add([&](OpenGL& gl){
+    //C itself
+    gl.drawOptions.drawVisualsOnly=true;
+    gl.drawOptions.drawColors=true;
+    C.setJointState(q_real);
+    C.glDraw(gl);
+
+    //waypoints
+    glColor(1., 1., .5, .3);
+    gl.drawOptions.drawColors=false;
+    for(uint t=0;t<waypoints.d0;t++){
+      C.setJointState(waypoints[t]);
+      C.glDraw(gl);
+    }
+
+    //shortPath
+    glColor(.5, 1., 1., .3);
+    gl.drawOptions.drawColors=false;
+    for(uint t=0;t<shortPath.d0;t++){
+      C.setJointState(shortPath[t]);
+      C.glDraw(gl);
+    }
+
+    //text
+    rai::String text;
+    text <<"phase: " <<phase <<" ctrlTime:" <<ctrlTime <<"\ntau: " <<tau;
+
+    glColor(.2,.2,.2,.5);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glOrtho(0., (double)gl.width, (double)gl.height, .0, -1., 1.);
-    glDrawText(text, 20, gl.height-20, 0, true);
+    glDrawText(text, 20, +20, 0, true);
   });
 
-  for(uint t=0;t<dat.d0;t++){
-    C.setJointState(dat(t, {2,2+13}));
-    text.clear() <<"phase: " <<dat(t,-1) <<" ctrlTime:" <<dat(t,1);
-    C.watch(true);
+  ifstream fil(logfile);
+  for(uint k=1;;k++){
+
+    fil >>stepCount >>ctrlTime >>phase;
+    if(!fil.good()) break;
+    CHECK_EQ(stepCount, k, "");
+
+    q_real.readTagged(fil, "q_real");
+    waypoints.readTagged(fil, "waypoints");
+    tau.readTagged(fil, "tau");
+    shortPath.readTagged(fil, "shortPath");
+
+
+    gl.watch();
   }
 
 };

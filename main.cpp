@@ -19,8 +19,8 @@ int main(int argc, char *argv[]){
 
 //  rai::setParameter<rai::String>("log", "z.22-02-21--12-42-43.secMPC.log");
 
-  if(rai::checkParameter<rai::String>("log")){
-    playLog(rai::getParameter<rai::String>("log"));
+  if(rai::checkParameter<bool>("log")){
+    playLog("z.SecMPC.log"); //rai::getParameter<rai::String>("log"));
     return 0;
   }
 

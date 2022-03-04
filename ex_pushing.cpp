@@ -74,7 +74,8 @@ void testPushing() {
   while(ex.step()){
     if(useOptitrack){
       C[obj]->setPosition(C["marc_red"]->getPosition());
-      C[target]->setPosition(C["green3"]->getPosition());
+      C[target]->setPosition(C["marc_green"]->getPosition());
+      C["obst"]->setPose(C["HandStick"]->getPose());
     }
   }
 }

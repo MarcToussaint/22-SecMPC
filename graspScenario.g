@@ -1,4 +1,4 @@
-Include: '../rai-robotModels/scenarios/pandasTable-calibrated.g'
+Include: '../botop/rai-robotModels/scenarios/pandasTable-calibrated.g'
 
 box (table){ joint: rigid, shape: ssBox, size: [.06,.08,.07,.01], Q:[-.0,-.0,.095] }
 

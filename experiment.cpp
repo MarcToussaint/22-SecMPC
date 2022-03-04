@@ -50,6 +50,7 @@ bool SecMPC_Experiments::step(){
     mpc->pathMPC.path.writeTagged(fil, "waypoints", true);
     mpc->timingMPC.tau.writeTagged(fil, "tau", true);
     mpc->shortMPC.path.writeTagged(fil, "shortPath", true);
+    C.getFrameState(logPoses).writeTagged(fil, "poses", true);
   }
 
   //-- send spline update
@@ -112,11 +113,14 @@ void setCamera(OpenGL& gl, rai::Frame* camF){
 
 void playLog(const rai::String& logfile){
   rai::Configuration C;
-  C.addFile("graspScenario.g");
+  C.addFile("pushScenario.g");
+
+  FrameL logPoses = C.getFrames({"puck", "target"});
+
 
   uint stepCount, phase;
   double ctrlTime;
-  arr q_real, waypoints, tau, shortPath;
+  arr q_real, waypoints, tau, shortPath, poses;
 
   OpenGL gl;
   gl.add(glStandardScene);
@@ -128,6 +132,7 @@ void playLog(const rai::String& logfile){
     gl.drawOptions.drawVisualsOnly=true;
     gl.drawOptions.drawColors=true;
     C.setJointState(q_real);
+    C.setFrameState(poses, logPoses);
     C.glDraw(gl);
 
     //waypoints
@@ -169,9 +174,11 @@ void playLog(const rai::String& logfile){
     waypoints.readTagged(fil, "waypoints");
     tau.readTagged(fil, "tau");
     shortPath.readTagged(fil, "shortPath");
+    poses.readTagged(fil, "poses");
 
 
-    gl.watch();
+    gl.update();
+    rai::wait(.1);
   }
 
 };

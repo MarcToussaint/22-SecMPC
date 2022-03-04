@@ -7,6 +7,7 @@
 void testPushing() {
   rai::Configuration C;
   C.addFile("pushScenario.g");
+//  arr qHome = C.getJointState();
 
   const char* pusher="stickTip";
   const char* obj="puck";
@@ -16,12 +17,21 @@ void testPushing() {
   //-- define constraints
   KOMO komo;
   komo.setModel(C, false);
+//  komo.world["target"] ->setJoint(rai::JT_transXYPhi) .addAttribute("constant", 1.);
   komo.setTiming(4., 1, 5., 1);
   komo.add_qControlObjective({}, 1, 1e-1);
+  komo.add_qControlObjective({}, 0, 1e-2);
+//  if(qHome.N) komo.addObjective({}, FS_qItself, {}, OT_sos, {.1}, qHome);
+
+  //waypoint constraints
   komo.addObjective({1.}, make_shared<F_PushRadiusPrior>(.13), {pusher, obj, target}, OT_eq, {1e1}, {0., 0., .1});
-  komo.addObjective({2.}, make_shared<F_PushRadiusPrior>(.10), {pusher, obj, target}, OT_eq, {1e1}, {0., 0., .02});
+  komo.addObjective({2.}, make_shared<F_PushRadiusPrior>(.08), {pusher, obj, target}, OT_eq, {1e1}, {0., 0., .02});
   komo.addObjective({3.}, make_shared<F_PushRadiusPrior>(.05), {pusher, obj, target}, OT_eq, {1e1}, {0., 0., .02});
-  komo.addObjective({4.}, make_shared<F_PushRadiusPrior>(.05), {pusher, obj, target}, OT_eq, {1e1}, {0., 0., .02});
+  komo.addObjective({4.}, make_shared<F_PushRadiusPrior>(.02), {pusher, obj, target}, OT_eq, {1e1}, {0., 0., .02});
+
+  komo.addObjective({3.}, FS_scalarProductZZ, {pusher, "world"}, OT_sos, {1e-1}, {1.});
+
+  //running constraints
   komo.addObjective({1., 4.}, make_shared<F_PushAligned>(), {pusher, obj, target}, OT_eq, {{1,3},{0,0,1e1}});
   komo.addObjective({1., 4.}, make_shared<F_PushSide>(), {pusher, obj, target}, OT_ineq, {1e1});
 
@@ -32,7 +42,10 @@ void testPushing() {
   komo.addSwitch({switchTime,-1}, true, make_shared<rai::KinematicSwitch>(rai::SW_joint, rai::JT_transXY, table, obj, komo.world, rai::SWInit_copy, 0, rel, NoTransformation));
   komo.addObjective({switchTime}, FS_pose, {obj}, OT_eq, {1e1}, NoArr, 1);
 
-  komo.addObjective({4.}, FS_positionDiff, {obj, target}, OT_eq, {1e1});
+//  komo.addObjective({4.}, FS_positionDiff, {obj, target}, OT_eq, {1e1});
+  komo.addObjective({4.}, FS_distance, {obj, target}, OT_eq, {1e1});
+//  komo.addObjective({4.}, FS_distance, {target, "puck_green"}, OT_eq, {});
+//  komo.addObjective({4.}, FS_qItself, {"target"}, OT_sos, {1e0});
 
   //komo.addObjective({1., 2.}, FS_positionRel, C, {"ball", "l_gripper"}, OT_eq, {{2,3},{1e1,0,0,0,1e1,0}});
   //komo.addObjective({2.}, FS_positionDiff, C, {"l_gripper", "ball"}, OT_eq, {1e1});
@@ -67,15 +80,17 @@ void testPushing() {
 
   bool useOptitrack=rai::getParameter<bool>("bot/useOptitrack", false);
 
-  SecMPC_Experiments ex(C, komo, .03, 1e0, .7, false);
+  SecMPC_Experiments ex(C, komo, .03, 1e0, .7);
+  ex.logPoses = C.getFrames({"puck", "target"});
   ex.step();
+  ex.mpc->tauCutoff=.1;
   ex.mpc->timingMPC.backtrackingTable=uintA{0, 0, 0, 0, 0, 0, 0};
 
   while(ex.step()){
     if(useOptitrack){
       C[obj]->setPosition(C["marc_red"]->getPosition());
       C[target]->setPosition(C["marc_green"]->getPosition());
-      C["obst"]->setPose(C["HandStick"]->getPose());
+      C["obst_base"]->setPose(C["HandStick"]->getPose());
     }
   }
 }

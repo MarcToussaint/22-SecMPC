@@ -13,6 +13,7 @@ struct SecMPC_Experiments{
   uint stepCount = 0;
 
   ofstream fil;
+  FrameL logPoses;
 
   KOMO& komo;
   double timeCost=1e0, ctrlCost=1e0;
